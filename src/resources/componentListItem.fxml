@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<fx:root maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" spacing="10.0" styleClass="component-list-item" type="VBox" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <HBox alignment="CENTER_LEFT">
+         <children>
+            <Label fx:id="componentName" text="Component Name">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font></Label>
+            <Label fx:id="failedLabel" maxWidth="-Infinity" minWidth="-Infinity" text="(Failed)" textFill="RED">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="2.0" />
+               </HBox.margin>
+            </Label>
+            <Region HBox.hgrow="ALWAYS" />
+            <ProgressIndicator fx:id="buildInProgress" prefHeight="20.0" prefWidth="20.0" styleClass="progress-spinner" />
+         </children>
+      </HBox>
+      <StackPane alignment="CENTER_LEFT">
+         <children>
+            <HBox fx:id="buildDisplay" spacing="5.0" visible="false">
+               <children>
+                  <Label fx:id="buildTimeLabel" text="00:00" />
+                  <ProgressBar fx:id="buildProgress" progress="0.0" />
+                  <Label fx:id="lastBuiltTimeLabel" text="59:59" />
+               </children>
+            </HBox>
+            <Label fx:id="lastBuiltLabel" text="Last Built: dd/mm/yy hh:mm:ss" />
+         </children>
+      </StackPane>
+   </children>
+   <padding>
+      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+   </padding>
+</fx:root>

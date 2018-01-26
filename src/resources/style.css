@@ -1,0 +1,208 @@
+.list-view:focused .list-cell:filled:selected:focused {
+     -fx-background-color: #ddd;
+     -fx-border-color: transparent transparent transparent #875A9D;
+     -fx-border-width: 0 0 0 5;
+     -fx-border-insets: 0;
+     -fx-padding: 3 0 3 2;
+}
+
+.list-view .list-cell:filled:selected {
+    -fx-background-color: #EEE;
+    -fx-border-color: transparent transparent transparent #BBB;
+    -fx-border-width: 0 0 0 5;
+    -fx-border-insets: 0;
+    -fx-padding: 3 0 3 2;
+}
+
+.list-view:focused .list-cell:filled:selected:focused,
+.list-view:focused .list-cell:filled:selected:focused .label {
+    -fx-text-fill: black;
+}
+
+.list-view:focused .list-cell:filled:selected:focused #failedLabel {
+    -fx-text-fill: red;
+}
+
+.component-list-item .progress-spinner {
+    -fx-progress-color: #875A9D;
+}
+
+.component-list-item .progress-bar {
+    -fx-accent: #875A9D;
+}
+
+.button.list-shift-button {
+    -fx-padding: 0;
+    -fx-border-radius: 0;
+}
+
+.console-scrollpane > .viewport {
+    -fx-background-color: #333;
+}
+
+.console-text {
+    -console-foreground: white;
+    -console-background: transparent;
+    -fx-font-family: Consolas;
+    -fx-fill: -console-foreground;
+    -fx-background-color: -console-background;
+}
+
+.console-text.bold {
+    -fx-font-weight: bold;
+}
+
+.console-text.underline {
+    -fx-underline: true;
+    -fx-stroke-width: 1;
+}
+
+.console-text.reversed {
+    -fx-text-fill: -console-background;
+    -fx-background-color: -console-foreground;
+}
+
+.console-text.black {
+    -console-foreground: black;
+}
+
+.console-text.red {
+    -console-foreground: red;
+}
+
+.console-text.green {
+    -console-foreground: green;
+}
+
+.console-text.yellow {
+    -console-foreground: yellow;
+}
+
+.console-text.blue {
+    -console-foreground: blue;
+}
+
+.console-text.magenta {
+    -console-foreground: #b800b8;
+}
+
+.console-text.cyan {
+    -console-foreground: #009b9b;
+}
+
+.console-text.white {
+    -console-foreground: white;
+}
+
+.console-text.bright-black {
+    -console-foreground: #555;
+    -fx-font-weight: bold;
+}
+
+.console-text.bright-red {
+    -console-foreground: #ff726b;
+    -fx-font-weight: bold;
+}
+
+.console-text.bright-green {
+    -console-foreground: lightgreen;
+    -fx-font-weight: bold;
+}
+
+.console-text.bright-yellow {
+    -console-foreground: #f6ff7e;
+    -fx-font-weight: bold;
+}
+
+.console-text.bright-blue {
+    -console-foreground: #6d6cff;
+    -fx-font-weight: bold;
+}
+
+.console-text.bright-magenta {
+    -console-foreground: magenta;
+    -fx-font-weight: bold;
+}
+
+.console-text.bright-cyan {
+    -console-foreground: cyan;
+    -fx-font-weight: bold;
+}
+
+.console-text.bright-white {
+    -console-foreground: white;
+    -fx-font-weight: bold;
+}
+
+.console-text.background-black {
+    -console-background: black;
+}
+
+.console-text.background-red {
+    -console-background: red;
+}
+
+.console-text.background-green {
+    -console-background: green;
+}
+
+.console-text.background-yellow {
+    -console-background: yellow;
+}
+
+.console-text.background-blue {
+    -console-background: blue;
+}
+
+.console-text.background-magenta {
+    -console-background: #b800b8;
+}
+
+.console-text.background-cyan {
+    -console-background: #009b9b;
+}
+
+.console-text.background-white {
+    -console-background: white;
+}
+
+.console-text.background-bright-black {
+    -console-background: #555;
+    -fx-font-weight: bold;
+}
+
+.console-text.background-bright-red {
+    -console-background: #ff726b;
+    -fx-font-weight: bold;
+}
+
+.console-text.background-bright-green {
+    -console-background: lightgreen;
+    -fx-font-weight: bold;
+}
+
+.console-text.background-bright-yellow {
+    -console-background: #f6ff7e;
+    -fx-font-weight: bold;
+}
+
+.console-text.background-bright-blue {
+    -console-background: #6d6cff;
+    -fx-font-weight: bold;
+}
+
+.console-text.background-bright-magenta {
+    -console-background: magenta;
+    -fx-font-weight: bold;
+}
+
+.console-text.background-bright-cyan {
+    -console-background: cyan;
+    -fx-font-weight: bold;
+}
+
+.console-text.background-bright-white {
+    -console-background: white;
+    -fx-font-weight: bold;
+}
+

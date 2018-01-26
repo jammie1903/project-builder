@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.text.TextFlow?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="100.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.jamie.builder.components.root.RootController">
+   <left>
+      <ListView fx:id="componentList" prefWidth="200.0" BorderPane.alignment="CENTER" />
+   </left>
+   <top>
+      <ToolBar fx:id="controlToolbar" prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+        <items>
+            <ComboBox fx:id="projectSelector" onAction="#selectProject" prefWidth="150.0" promptText="Select Project" />
+            <Button fx:id="editProjectButton" mnemonicParsing="false" onAction="#edit" text="Edit" />
+            <Button fx:id="newProjectButton" mnemonicParsing="false" onAction="#newProject" text="New Project" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Button fx:id="buildSingleButton" mnemonicParsing="false" onAction="#buildSingle" text="Build This" />
+            <Button fx:id="buildChainButton" mnemonicParsing="false" onAction="#buildChain" text="Build Chain" />
+            <Button fx:id="buildCancelButton" mnemonicParsing="false" onAction="#cancelBuild" text="Cancel" visible="false" />
+        </items>
+      </ToolBar>
+   </top>
+   <center>
+      <ScrollPane fx:id="consoleScrollPane" styleClass="console-scrollpane" BorderPane.alignment="CENTER">
+         <content>
+            <TextFlow fx:id="console">
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </padding></TextFlow>
+         </content>
+      </ScrollPane>
+   </center>
+</BorderPane>
