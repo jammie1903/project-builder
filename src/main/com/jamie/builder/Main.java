@@ -25,7 +25,10 @@ public class Main extends Application {
         controller.setStage(primaryStage);
         primaryStage.getIcons().add(new Image(this.getClass().getResourceAsStream("/icon.png")));
         primaryStage.show();
-        primaryStage.setOnCloseRequest((e) -> AppTime.end());
+        primaryStage.setOnCloseRequest((e) -> {
+            controller.cancelBuild();
+            AppTime.end();
+        });
     }
 
 

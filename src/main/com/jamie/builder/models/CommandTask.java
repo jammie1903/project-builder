@@ -4,10 +4,14 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
 public class CommandTask extends Task {
+    private static final String CONSOLE = System.getProperty("os.name").toLowerCase().contains("windows") ? "cmd.exe" : "sh";;
     private String[] command;
 
-    public CommandTask(String[] command, boolean continuous, String initialBuildCompletionString) {
-        this.command = command;
+    public CommandTask(String location, String buildCommand, boolean continuous, String initialBuildCompletionString) {
+        String drive = location.substring(0, 1);
+        String mainCommand = "cd \"" + location + "\" && " + buildCommand;
+
+        this.command = new String[]{CONSOLE, "/" + drive, mainCommand};
         this.continuous = continuous;
         this.initialBuildCompletionString = initialBuildCompletionString;
     }
@@ -36,6 +40,8 @@ public class CommandTask extends Task {
                 updateLog(line);
             }
             if (this.kill) {
+                System.out.println("Killing " + String.join("; ", this.command));
+                p.descendants().forEach(ProcessHandle::destroyForcibly);
                 p.destroyForcibly();
                 break;
             }

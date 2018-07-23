@@ -127,13 +127,8 @@ public class Component {
         this.distributionFolder = distributionFolder;
     }
 
-    private String[] getFullCommand() {
-        if (this.buildCommand == null || this.buildCommand.trim().isEmpty()) {
-            return null;
-        }
-        String drive = location.substring(0, 1);
-        String mainCommand = "cd \"" + location + "\" && " + this.buildCommand;
-        return new String[]{"cmd.exe", "/" + drive, mainCommand};
+    private boolean hasBuildCommand() {
+        return this.buildCommand != null && !this.buildCommand.trim().isEmpty();
     }
 
     private List<Task> getCopyTasks() {
@@ -164,9 +159,8 @@ public class Component {
         }
 
         Build build = new Build();
-        String[] buildCommand = getFullCommand();
-        if (buildCommand != null) {
-            build.addTask(new CommandTask(buildCommand, this.continuous, this.initialBuildCompletedText));
+        if (this.hasBuildCommand()) {
+            build.addTask(new CommandTask(this.location, this.buildCommand, this.continuous, this.initialBuildCompletedText));
         }
         build.addTasks(getCopyTasks());
         this.currentBuild = build;

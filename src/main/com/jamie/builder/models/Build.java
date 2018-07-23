@@ -92,13 +92,7 @@ public class Build {
                 task.fullyCompleteProperty().addListener((observable, oldValue, newValue) -> {
                     if(newValue) {
                         this.continuousTasks.remove(task);
-                        if(this.continuousTasks.isEmpty() && this.completeProperty().isNotNull().get()) {
-                            this.fullyComplete.set(true);
-                            if (killed) {
-                                updateLog('\n' + AnsiCode.BRIGHT_RED.getDisplayValue() + "BUILD CANCELLED" + AnsiCode.RESET.getDisplayValue());
-                            }
-                            buffer.end();
-                        }
+                        onFullyComplete();
                     }
                 });
             }
@@ -106,13 +100,17 @@ public class Build {
         } else {
             successful.set(false);
             complete.set(new Date());
-            if(this.continuousTasks.isEmpty() && this.completeProperty().isNotNull().get()) {
-                this.fullyComplete.set(true);
-                if (killed) {
-                    updateLog('\n' + AnsiCode.BRIGHT_RED.getDisplayValue() + "BUILD CANCELLED" + AnsiCode.RESET.getDisplayValue());
-                }
-                buffer.end();
+            onFullyComplete();
+        }
+    }
+
+    private void onFullyComplete() {
+        if(this.continuousTasks.isEmpty() && this.completeProperty().isNotNull().get()) {
+            this.fullyComplete.set(true);
+            if (killed) {
+                updateLog('\n' + AnsiCode.BRIGHT_RED.getDisplayValue() + "BUILD CANCELLED" + AnsiCode.RESET.getDisplayValue());
             }
+            buffer.end();
         }
     }
 
@@ -157,14 +155,6 @@ public class Build {
 
     public ConsoleLogBuilder getConsoleLogBuilder() {
         return consoleLogBuilder;
-    }
-
-    @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
-        if (buffer != null) {
-            buffer.end();
-        }
     }
 
     public boolean isKilled() {

@@ -31,12 +31,6 @@ public class AppTime {
         timer.cancel();
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
-        endTimer();
-    }
-
     public static ReadOnlyObjectProperty<Date> property() {
         if (instance == null) {
             instance = new AppTime();

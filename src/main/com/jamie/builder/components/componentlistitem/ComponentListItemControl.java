@@ -121,13 +121,4 @@ public class ComponentListItemControl extends VBox {
             }
         }, dividend, divisor);
     }
-
-    @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
-        lastBuiltStringBinding.dispose();
-        lastBuiltTimeBinding.dispose();
-        durationStringBinding.dispose();
-        durationBinding.dispose();
-    }
 }

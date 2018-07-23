@@ -246,7 +246,7 @@ public class RootController implements Initializable {
     }
 
     @FXML
-    void cancelBuild() {
+    public void cancelBuild() {
         if (this.buildInProgress.get()) {
             this.buildCancelled.set(true);
             componentList.getItems().forEach((component) -> {
@@ -258,7 +258,7 @@ public class RootController implements Initializable {
         }
     }
 
-    boolean isBuildRunning() {
+    public boolean isBuildRunning() {
         return componentList.getItems().stream().anyMatch(c -> c.getCurrentBuild() != null);
     }
 
