@@ -17,6 +17,8 @@ public class ComponentEditData {
     private StringProperty location = new SimpleStringProperty("");
     private StringProperty buildCommand = new SimpleStringProperty("");
     private StringProperty distributionFolder = new SimpleStringProperty("");
+    private BooleanProperty continuous = new SimpleBooleanProperty(false);
+    private StringProperty initialBuildCompleteString = new SimpleStringProperty("");
 
     private StringBinding name = Bindings.createStringBinding(this::getName, location);
 
@@ -31,6 +33,8 @@ public class ComponentEditData {
         location.set(boundComponent.getLocation());
         buildCommand.set(boundComponent.getBuildCommand());
         distributionFolder.set(boundComponent.getDistributionFolder());
+        continuous.set(boundComponent.isContinuous());
+        initialBuildCompleteString.set(boundComponent.getInitialBuildCompletedText());
     }
 
     public void initDependantComponents(List<ComponentEditData> allComponents) {
@@ -56,6 +60,8 @@ public class ComponentEditData {
             boundComponent.setBuildCommand(buildCommand.get());
             boundComponent.setDistributionFolder(distributionFolder.get());
             boundComponent.setDependantComponents(dependencyArray);
+            boundComponent.setContinuous(continuous.get());
+            boundComponent.setInitialBuildCompletedText(initialBuildCompleteString.get());
         } else {
             boundComponent = new Component(location.get(), buildCommand.get(), distributionFolder.get(), dependencyArray);
         }
@@ -76,6 +82,14 @@ public class ComponentEditData {
 
     public StringProperty locationProperty() {
         return location;
+    }
+
+    public BooleanProperty continuousProperty() {
+        return continuous;
+    }
+
+    public StringProperty initialBuildCompleteStringProperty() {
+        return initialBuildCompleteString;
     }
 
     public Map<ComponentEditData, BooleanProperty> getDependantComponents() {

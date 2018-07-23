@@ -17,7 +17,9 @@ public class Build {
     private ObjectProperty<Date> started = new SimpleObjectProperty<>();
     private ObjectProperty<Date> complete = new SimpleObjectProperty<>();
     private BooleanProperty successful = new SimpleBooleanProperty();
+    private BooleanProperty fullyComplete = new SimpleBooleanProperty(false);
     private List<Task> tasks = new ArrayList<>();
+    private List<Task> continuousTasks = new ArrayList<>();
     private int stage = -1;
     private boolean killed = false;
 
@@ -34,7 +36,7 @@ public class Build {
 
     public void start() {
         if (!started.isNotNull().get()) {
-            if(tasks.isEmpty()) {
+            if (tasks.isEmpty()) {
                 addTask(new PlaceholderTask());
             }
             started.set(new Date());
@@ -45,8 +47,13 @@ public class Build {
     }
 
     public void kill() {
-        tasks.get(stage).kill();
         this.killed = true;
+        if (!this.continuousTasks.isEmpty()) {
+            this.continuousTasks.forEach(Task::kill);
+        }
+        if (stage < tasks.size()) {
+            tasks.get(stage).kill();
+        }
     }
 
     private void nextTask() {
@@ -54,32 +61,57 @@ public class Build {
         if (stage >= tasks.size() || killed) {
             successful.set(stage >= tasks.size());
             complete.set(new Date());
-            if(killed) {
-                updateLog('\n' + AnsiCode.BRIGHT_RED.getDisplayValue() + "BUILD CANCELLED" + AnsiCode.RESET.getDisplayValue());
+
+            if (this.continuousTasks.isEmpty()) {
+                this.fullyComplete.set(true);
+                if (killed) {
+                    updateLog('\n' + AnsiCode.BRIGHT_RED.getDisplayValue() + "BUILD CANCELLED" + AnsiCode.RESET.getDisplayValue());
+                }
+                buffer.end();
             }
-            buffer.end();
         } else {
             try {
                 tasks.get(stage).run();
 
-                tasks.get(stage).complete.addListener(
-                        (observable, oldValue, newValue) -> {
-                            if (newValue) {
-                                if (tasks.get(stage).successfulProperty().get()) {
-                                    nextTask(); //TODO check for errors
-                                } else {
-                                    successful.set(false);
-                                    complete.set(new Date());
-                                    if(killed) {
-                                        updateLog('\n' + AnsiCode.BRIGHT_RED.getDisplayValue() + "BUILD CANCELLED" + AnsiCode.RESET.getDisplayValue());
-                                    }
-                                    buffer.end();
-                                }
-                            }
-                        }
-                );
+                tasks.get(stage).complete.addListener((observable, oldValue, newValue) -> {
+                    if (newValue) {
+                        onComplete();
+                    }
+                });
             } catch (Exception e) {
                 e.printStackTrace(); // TODO handle
+            }
+        }
+    }
+
+    private void onComplete() {
+        if (tasks.get(stage).successfulProperty().get()) {
+            if (tasks.get(stage).continuous) {
+                final Task task = tasks.get(stage);
+                this.continuousTasks.add(task);
+                task.fullyCompleteProperty().addListener((observable, oldValue, newValue) -> {
+                    if(newValue) {
+                        this.continuousTasks.remove(task);
+                        if(this.continuousTasks.isEmpty() && this.completeProperty().isNotNull().get()) {
+                            this.fullyComplete.set(true);
+                            if (killed) {
+                                updateLog('\n' + AnsiCode.BRIGHT_RED.getDisplayValue() + "BUILD CANCELLED" + AnsiCode.RESET.getDisplayValue());
+                            }
+                            buffer.end();
+                        }
+                    }
+                });
+            }
+            nextTask();
+        } else {
+            successful.set(false);
+            complete.set(new Date());
+            if(this.continuousTasks.isEmpty() && this.completeProperty().isNotNull().get()) {
+                this.fullyComplete.set(true);
+                if (killed) {
+                    updateLog('\n' + AnsiCode.BRIGHT_RED.getDisplayValue() + "BUILD CANCELLED" + AnsiCode.RESET.getDisplayValue());
+                }
+                buffer.end();
             }
         }
     }
@@ -111,6 +143,10 @@ public class Build {
         return complete;
     }
 
+    public BooleanProperty fullyCompleteProperty() {
+        return fullyComplete;
+    }
+
     public ReadOnlyBooleanProperty successfulProperty() {
         return successful;
     }
@@ -133,5 +169,9 @@ public class Build {
 
     public boolean isKilled() {
         return killed;
+    }
+
+    public boolean isContinuous() {
+        return !this.continuousTasks.isEmpty();
     }
 }

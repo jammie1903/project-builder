@@ -11,6 +11,7 @@ public class ComponentDisplayModel {
     private LongProperty lastBuildDuration = new SimpleLongProperty();
     private BooleanProperty running = new SimpleBooleanProperty();
     private BooleanProperty failed = new SimpleBooleanProperty();
+    private BooleanProperty continuous = new SimpleBooleanProperty();
     private ObjectProperty<Date> startTime = new SimpleObjectProperty<>();
 
     protected void setName(String name) {
@@ -36,6 +37,10 @@ public class ComponentDisplayModel {
     protected void setStartTime(Date startTime) {
         this.startTime.set(startTime);
     }
+    
+    public void setContinuous(boolean continuous) {
+        this.continuous.set(continuous);
+    }
 
     public ReadOnlyStringProperty nameProperty() {
         return name;
@@ -59,5 +64,9 @@ public class ComponentDisplayModel {
 
     public ReadOnlyObjectProperty<Date> startTimeProperty() {
         return startTime;
+    }
+
+    public BooleanProperty continuousProperty() {
+        return continuous;
     }
 }

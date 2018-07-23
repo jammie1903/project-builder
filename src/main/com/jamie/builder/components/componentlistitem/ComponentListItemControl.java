@@ -83,13 +83,14 @@ public class ComponentListItemControl extends VBox {
         durationStringBinding = Bindings.createStringBinding(() -> getDurationString(durationBinding.get()), durationBinding);
         buildTimeLabel.textProperty().bind(durationStringBinding);
 
-        buildProgress.progressProperty().bind(Bindings.when(model.lastBuildDurationProperty().greaterThan(0))
+        buildProgress.progressProperty().bind(Bindings.when(model.lastBuildDurationProperty().greaterThan(0).and(model.continuousProperty().not()))
                 .then(Bindings.min(100.0, divideSafe(durationBinding,model.lastBuildDurationProperty())))
                 .otherwise(-1.0));
 
         lastBuiltTimeBinding = Bindings.createStringBinding(() -> getDurationString(model.lastBuildDurationProperty().get()), model.lastBuildDurationProperty());
 
         lastBuiltTimeLabel.textProperty().bind(lastBuiltTimeBinding);
+        lastBuiltTimeLabel.visibleProperty().bind(model.continuousProperty().not());
 
         DateFormat formatter = new SimpleDateFormat("dd/MM/yy hh:mm:ss");
         lastBuiltStringBinding = Bindings.createStringBinding(() -> model.lastBuildTimeProperty().get()  == null ? "" : "Last built: " + formatter.format(model.lastBuildTimeProperty().get()), model.lastBuildTimeProperty());

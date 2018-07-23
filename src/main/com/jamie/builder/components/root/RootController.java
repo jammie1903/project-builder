@@ -190,6 +190,14 @@ public class RootController implements Initializable {
                     if (!build.successfulProperty().get()) {
                         failed.set(true);
                     }
+                    if(!build.fullyCompleteProperty().get()) {
+                        build.fullyCompleteProperty().addListener(i -> {
+                            if((buildQueue.isEmpty() || failed.get() || buildCancelled.get()) && !isBuildRunning()) {
+                                buildInProgress.set(false);
+                                buildCancelled.set(false);
+                            }
+                        });
+                    }
                     runCount.set(runCount.get() + 1);
                 });
             }
@@ -199,8 +207,10 @@ public class RootController implements Initializable {
             runCount.addListener((observable, oldValue, newValue) -> {
                 if (newValue.intValue() == components.size()) {
                     if (failed.get() || buildCancelled.get()) {
-                        buildInProgress.set(false);
-                        buildCancelled.set(false);
+                        if (!isBuildRunning()) {
+                            buildInProgress.set(false);
+                            buildCancelled.set(false);
+                        }
                         buildQueue.clear();
                     } else {
                         runBuildChain();
@@ -208,15 +218,17 @@ public class RootController implements Initializable {
                 }
             });
         } else {
-            buildInProgress.set(false);
-            buildCancelled.set(false);
+            if (!isBuildRunning()) {
+                buildInProgress.set(false);
+                buildCancelled.set(false);
+            }
         }
     }
 
     @FXML
     public void buildSingle() {
         Build build = startBuild();
-        build.completeProperty().addListener((observable, oldValue, newValue) -> {
+        build.fullyCompleteProperty().addListener((observable, oldValue, newValue) -> {
             buildInProgress.set(false);
             buildCancelled.set(false);
         });
@@ -244,6 +256,10 @@ public class RootController implements Initializable {
                 }
             });
         }
+    }
+
+    boolean isBuildRunning() {
+        return componentList.getItems().stream().anyMatch(c -> c.getCurrentBuild() != null);
     }
 
     @FXML

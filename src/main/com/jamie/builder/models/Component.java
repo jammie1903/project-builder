@@ -30,6 +30,11 @@ public class Component {
     private String distributionFolder;
 
     @XStreamAsAttribute
+    private boolean continuous;
+    @XStreamAsAttribute
+    private String initialBuildCompletedText;
+
+    @XStreamAsAttribute
     private Date lastBuildTime;
 
     @XStreamAsAttribute
@@ -64,7 +69,7 @@ public class Component {
             model.setLastBuildDuration(this.lastBuildDuration);
         }
         if (name == null) {
-            name = location.substring(Math.max(0, location.lastIndexOf('\\') + 1));
+            name = location.substring(Math.max(0, location.lastIndexOf(File.separator) + 1));
             model.setName(this.name);
         }
         if (historicBuilds == null) {
@@ -94,7 +99,7 @@ public class Component {
 
     public void setLocation(String location) {
         this.location = location;
-        this.name = location.substring(Math.max(0, location.lastIndexOf('\\') + 1));
+        this.name = location.substring(Math.max(0, location.lastIndexOf(File.separator) + 1));
         Platform.runLater(() -> model.setName(this.name));
     }
 
@@ -161,27 +166,36 @@ public class Component {
         Build build = new Build();
         String[] buildCommand = getFullCommand();
         if (buildCommand != null) {
-            build.addTask(new CommandTask(buildCommand));
+            build.addTask(new CommandTask(buildCommand, this.continuous, this.initialBuildCompletedText));
         }
         build.addTasks(getCopyTasks());
         this.currentBuild = build;
         build.completeProperty().addListener(observable -> {
-            historicBuilds.add(this.currentBuild);
-            this.currentBuild = null;
-            if(build.successfulProperty().get() || !build.isKilled()) {
+
+            if (build.successfulProperty().get() || !build.isKilled()) {
                 this.lastBuildTime = build.startedProperty().get();
                 this.lastBuildDuration = build.completeProperty().get().getTime() - build.startedProperty().get().getTime();
             }
             Platform.runLater(() -> {
-                if(build.successfulProperty().get() || !build.isKilled()) {
+                if (build.successfulProperty().get() || !build.isKilled()) {
                     model.setLastBuildTime(this.lastBuildTime);
                     model.setLastBuildDuration(this.lastBuildDuration);
                 }
-                model.setRunning(false);
+                model.setRunning(!build.fullyCompleteProperty().get());
+                model.setContinuous(!build.fullyCompleteProperty().get());
                 model.setFailed(build.successfulProperty().not().get());
             });
             DataController.get().save();
         });
+        build.fullyCompleteProperty().addListener(observable -> {
+            historicBuilds.add(this.currentBuild);
+            this.currentBuild = null;
+            Platform.runLater(() -> {
+                model.setRunning(false);
+                model.setContinuous(false);
+            });
+        });
+
         build.start();
         Platform.runLater(() -> {
             model.setStartTime(build.startedProperty().get());
@@ -197,5 +211,21 @@ public class Component {
 
     public ComponentDisplayModel getDisplayModel() {
         return model;
+    }
+
+    public boolean isContinuous() {
+        return continuous;
+    }
+
+    public String getInitialBuildCompletedText() {
+        return initialBuildCompletedText;
+    }
+
+    public void setContinuous(boolean continuous) {
+        this.continuous = continuous;
+    }
+
+    public void setInitialBuildCompletedText(String initialBuildCompletedText) {
+        this.initialBuildCompletedText = initialBuildCompletedText;
     }
 }

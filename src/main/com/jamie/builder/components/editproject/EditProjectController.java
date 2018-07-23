@@ -37,6 +37,12 @@ public class EditProjectController {
     private TextField path;
 
     @FXML
+    private CheckBox continuous;
+
+    @FXML
+    private TextField initialBuildEndString;
+
+    @FXML
     private ListView<ComponentEditData> dependantComponents;
 
     @FXML
@@ -77,21 +83,28 @@ public class EditProjectController {
         }
         currentSelection = componentList.getSelectionModel().selectedItemProperty();
         currentSelectionIndex = componentList.getSelectionModel().selectedIndexProperty();
+        initialBuildEndString.disableProperty().bind(continuous.selectedProperty().not());
 
         currentSelection.addListener((observable, oldValue, newValue) -> {
             if (oldValue != null) {
                 buildCommand.textProperty().unbindBidirectional(oldValue.buildCommandProperty());
                 distributionFolder.textProperty().unbindBidirectional(oldValue.distributionFolderProperty());
                 path.textProperty().unbindBidirectional(oldValue.locationProperty());
+                continuous.selectedProperty().unbindBidirectional(oldValue.continuousProperty());
+                initialBuildEndString.textProperty().unbindBidirectional(oldValue.initialBuildCompleteStringProperty());
             }
             if (newValue != null) {
                 buildCommand.textProperty().bindBidirectional(newValue.buildCommandProperty());
                 distributionFolder.textProperty().bindBidirectional(newValue.distributionFolderProperty());
                 path.textProperty().bindBidirectional(newValue.locationProperty());
+                continuous.selectedProperty().bindBidirectional(newValue.continuousProperty());
+                initialBuildEndString.textProperty().bindBidirectional(newValue.initialBuildCompleteStringProperty());
             } else {
                 buildCommand.setText("");
                 distributionFolder.setText("");
                 path.setText("");
+                continuous.setSelected(false);
+                initialBuildEndString.setText("");
             }
             dependantComponents.setItems(FXCollections.observableArrayList());
             dependantComponents.setItems(componentList.getItems());
