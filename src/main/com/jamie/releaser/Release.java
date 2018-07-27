@@ -34,9 +34,7 @@ public class Release {
             }
             in.close();
 
-            System.out.println(response.toString());
             return gson.fromJson(response.toString(), clazz);
-
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -105,9 +103,6 @@ public class Release {
     }
 
     public static void main(String... args) throws Exception {
-        System.out.println("args: " + Arrays.toString(args));
-        var releaseType = args.length > 0 ? Version.VersionSegment.valueOf(args[0].toUpperCase()) : Version.VersionSegment.MINOR;
-        System.out.println("Release type: " + releaseType);
         JsonReader reader = new JsonReader(new FileReader("github-authentication.json"));
         GithubAuthentication authentication = gson.fromJson(reader, GithubAuthentication.class);
         System.out.println("performing release as " + authentication.getUsername());
@@ -117,27 +112,35 @@ public class Release {
         String loadFrom = null;
         if (lastRelease != null) {
             lastVersion = new Version(lastRelease.tag_name);
-            Calendar c = Calendar.getInstance(TimeZone.getDefault());
-            DateFormat f = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'Z'");
-            c.setTime(f.parse(lastRelease.created_at));
-            c.add(Calendar.MINUTE, 1);
-            loadFrom = f.format(c.getTime());
-            System.out.println("last version release details:" + lastRelease.name + " created at " + lastRelease.created_at);
+            loadFrom = lastRelease.created_at;
+            System.out.println("last version release details: " + lastRelease.name + " created at " + lastRelease.created_at);
         } else {
             lastVersion = new Version(0, 0, 0);
             System.out.println("no previous release found");
         }
-        lastVersion.increment(releaseType);
-        System.out.println("new Version: " + lastVersion);
+        var newVersion = new Version(Files.readAllLines(new File(Release.class.getResource("/version.txt").getPath()).toPath()).get(0).trim());
+
+        System.out.println("new Version: " + newVersion);
+
+        if(lastVersion.compareTo(newVersion) >= 0) {
+            System.err.println("please increment the version.txt file!");
+        }
 
         GithubCommit[] commits = get("https://api.github.com/repos/jammie1903/project-builder/commits" + (loadFrom != null ? "?since=" + loadFrom : ""), authentication, GithubCommit[].class);
-        var releaseDetails = GithubRelease.newRelease(lastVersion.toString(), commits);
+
+        // remove the last commit as it will be the one for the last release
+        commits = commits == null ? null : Arrays.copyOf(commits, commits.length - 1);
+        var releaseDetails = GithubRelease.newRelease(newVersion.toString(), commits);
         System.out.println("Release message: \n ----------------------------------------\n\n" + releaseDetails.body);
 
         System.out.println("\n\n---------------------------------------\n\nZipping release folder...");
         File releaseZip = Zip.pack(new File("out/artifacts/project_builder"));
         System.out.println("submitting release...");
         var newRelease = post("https://api.github.com/repos/jammie1903/project-builder/releases", authentication, GithubRelease.class, releaseDetails);
+        if (newRelease == null) {
+            System.err.println("New release failed, aborting");
+            return;
+        }
         System.out.println("new release: " + newRelease.html_url);
 
         var releaseId = newRelease.id;

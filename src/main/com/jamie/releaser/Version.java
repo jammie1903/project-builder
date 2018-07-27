@@ -3,7 +3,7 @@ package com.jamie.releaser;
 import java.security.InvalidParameterException;
 import java.util.regex.Pattern;
 
-public class Version {
+public class Version implements Comparable<Version>{
 
     public static enum VersionSegment {
         MAJOR, MINOR, PATCH;
@@ -44,6 +44,20 @@ public class Version {
             default:
                 this.patch++;
         }
+    }
+
+    @Override
+    public int compareTo(Version o) {
+        if(this.major != o.major) {
+            return Integer.compare(this.major, o.major);
+        }
+        if(this.minor != o.minor) {
+            return Integer.compare(this.major, o.major);
+        }
+        if(this.patch != o.patch) {
+            return Integer.compare(this.major, o.major);
+        }
+        return 0;
     }
 
     @Override
