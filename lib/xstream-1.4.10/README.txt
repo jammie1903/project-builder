@@ -26,7 +26,7 @@ includes:
 
 The complete source for XStream is bundled in the -src archive.
 This includes:
- * Main API [xstream/src/java]
+ * com.jamie.releaser.Release API [xstream/src/java]
  * Unit tests [xstream/src/test]
  * Maven build files [pom.xml] 
  * Hibernate module [xstream-hibernate]

@@ -1,0 +1,7 @@
+<project default="cleanArtifacts">
+    <target name="cleanArtifacts">
+        <delete includeEmptyDirs="true">
+            <fileset dir="out/artifacts" includes="**/*"/>
+        </delete>
+    </target>
+</project>
