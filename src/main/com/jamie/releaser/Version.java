@@ -52,10 +52,10 @@ public class Version implements Comparable<Version>{
             return Integer.compare(this.major, o.major);
         }
         if(this.minor != o.minor) {
-            return Integer.compare(this.major, o.major);
+            return Integer.compare(this.minor, o.minor);
         }
         if(this.patch != o.patch) {
-            return Integer.compare(this.major, o.major);
+            return Integer.compare(this.patch, o.patch);
         }
         return 0;
     }

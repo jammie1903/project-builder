@@ -6,6 +6,9 @@ import com.jamie.builder.data.DataController;
 import com.jamie.builder.models.Build;
 import com.jamie.builder.models.Component;
 import com.jamie.builder.models.Project;
+import com.jamie.releaser.GithubRelease;
+import com.jamie.releaser.Release;
+import com.jamie.releaser.Version;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
@@ -19,15 +22,24 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.awt.*;
+import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.*;
+import java.util.List;
+
+import static com.jamie.rest.Rest.get;
 
 public class RootController implements Initializable {
 
@@ -81,7 +93,7 @@ public class RootController implements Initializable {
         projectSelector.setItems(FXCollections.observableArrayList(DataController.get().getProjects()));
         projectSelector.getSelectionModel().select(0);
 
-        componentList.setCellFactory(param -> new ListCell<Component>() {
+        componentList.setCellFactory(param -> new ListCell<>() {
             @Override
             protected void updateItem(Component item, boolean empty) {
                 super.updateItem(item, empty);
@@ -132,6 +144,36 @@ public class RootController implements Initializable {
                 Platform.runLater(() -> this.stage.toFront());
             }
         });
+
+        var updateLink = checkVersion();
+        if(updateLink != null) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("New Version Available");
+            alert.setHeaderText("New Version Available");
+            alert.setContentText("A new version of the project builder is available, would you like to go to the release page?");
+            if(ButtonType.OK.equals(alert.showAndWait().orElse(null))) {
+                try {
+                    Desktop.getDesktop().browse(new URI(updateLink));
+                } catch(Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private String checkVersion(){
+        var lastRelease = get("https://api.github.com/repos/jammie1903/project-builder/releases/latest", null, GithubRelease.class);
+        if (lastRelease == null) {
+            return null;
+        }
+        var latestVersion = new Version(lastRelease.tag_name);
+        try {
+            var currentVersion = new Version(Files.readAllLines(new File(Release.class.getResource("/version.txt").getPath()).toPath()).get(0).trim());
+            return latestVersion.compareTo(currentVersion) > 0 ? lastRelease.html_url : null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     private void bindBuildToConsole(Build latestBuild) {

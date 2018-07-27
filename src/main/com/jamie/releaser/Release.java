@@ -4,103 +4,12 @@ import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
+import static com.jamie.rest.Rest.*;
 
 public class Release {
     private static Gson gson = new Gson();
-
-    private static <T> T get(String url, GithubAuthentication authentication, Class<T> clazz) {
-        try {
-            URL obj = new URL(url);
-            HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setRequestProperty("Authorization", "basic " + authentication.getBasicToken());
-            connection.getResponseCode();
-
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(connection.getInputStream()));
-            String inputLine;
-            StringBuffer response = new StringBuffer();
-
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-
-            return gson.fromJson(response.toString(), clazz);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    private static <T, S> S post(String url, GithubAuthentication authentication, Class<S> clazz, T body) {
-
-        int code;
-        HttpURLConnection connection;
-        try {
-            URL obj = new URL(url);
-            connection = (HttpURLConnection) obj.openConnection();
-            connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Type", body instanceof Path ?
-                    URLConnection.guessContentTypeFromName(((Path) body).getFileName().toString()) : "application/json");
-            connection.setRequestProperty("Authorization", "basic " + authentication.getBasicToken());
-            if (body instanceof Path) {
-                connection.setRequestProperty("Content-Transfer-Encoding", "binary");
-            }
-            connection.setDoOutput(true);
-            try (OutputStream output = connection.getOutputStream()) {
-
-                if (body instanceof Path) {
-                    Files.copy((Path) body, output);
-                } else {
-                    try (OutputStreamWriter wr = new OutputStreamWriter(output)) {
-                        wr.write(gson.toJson(body));
-                        wr.flush();
-                    }
-                }
-            }
-            code = connection.getResponseCode();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return null;
-        }
-
-        try (BufferedReader in = new BufferedReader(
-                new InputStreamReader(connection.getInputStream()))) {
-            String inputLine;
-            if (clazz == null) {
-                return null;
-            }
-            StringBuilder response = new StringBuilder();
-
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            return gson.fromJson(response.toString(), clazz);
-        } catch (Exception e) {
-            try (BufferedReader in = new BufferedReader(
-                    new InputStreamReader(connection.getErrorStream()))) {
-                String inputLine;
-                StringBuilder response = new StringBuilder();
-
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
-                }
-                throw new Exception(response.toString());
-            } catch (Exception ex) {
-                System.err.println(code + ex.getMessage());
-                return null;
-            }
-        }
-    }
 
     public static void main(String... args) throws Exception {
         JsonReader reader = new JsonReader(new FileReader("github-authentication.json"));
@@ -124,6 +33,7 @@ public class Release {
 
         if(lastVersion.compareTo(newVersion) >= 0) {
             System.err.println("please increment the version.txt file!");
+            return;
         }
 
         GithubCommit[] commits = get("https://api.github.com/repos/jammie1903/project-builder/commits" + (loadFrom != null ? "?since=" + loadFrom : ""), authentication, GithubCommit[].class);
