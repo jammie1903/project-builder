@@ -1,6 +1,6 @@
 # Contributing
 
-If you wish to make a contribution to this project, please make sure there is a relevant issue created for it first. Also, please assign (or ask a contributor to assign) the relevant issue to yourself whislt working on it, to avoid any wasted effort by another developer.
+If you wish to make a contribution to this project, please make sure there is a relevant issue created for it first. Also, please assign (or ask a contributor to assign) the relevant issue to yourself whilst working on it, to avoid any wasted effort by another developer.
 
 ## Pull Request Process
 
